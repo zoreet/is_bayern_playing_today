@@ -1,6 +1,7 @@
 <?php
 
 include('tokens.php');
+global $PUSHOVER_TOKEN, $PUSHOVER_USER, $DATA_TOKEN;
 $TEAM_ID = 5;
 
 // ----------------------------------------------------------------------------
@@ -26,7 +27,9 @@ if(!$data['matches'] || count($data['matches']) == 0 ) {
 }
 
 $today = new DateTime();
+$today->setTime( 0, 0, 0 );
 $matchDate = new DateTime($data['matches'][0]['utcDate']);
+$matchDate = $matchDate->setTime( 0, 0, 0 );
 $diff = $today->diff($matchDate)->days;
 
 // ----------------------------------------------------------------------------
@@ -34,12 +37,14 @@ $diff = $today->diff($matchDate)->days;
 // FIGURE IT OUT
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+$message = '';
+$matchTime = new DateTime($data['matches'][0]['utcDate']);
+$matchTime->setTimezone(new DateTimeZone('Europe/Amsterdam'));
 if( $diff == 0 || $diff == 1 ) {
   $title = $data['matches'][0]['homeTeam']['name'] . ' vs ' . $data['matches'][0]['awayTeam']['name'];
-  $matchDate->setTimezone(new DateTimeZone('Europe/Amsterdam'));
   $message .= $diff ? 'Tomorrow' : 'Today';
   $message .= ' at ';
-  $message .= $matchDate->format('G:i');
+  $message .= $matchTime->format('G:i');;
   $message .= ' in ';
   $message .= $data['matches'][0]['competition']['name'];
   pushNotification($title, $message);
